@@ -1,5 +1,5 @@
 all:
-	rm -rf game.love
-	zip -r game *
-	mv game.zip game.love
-	love game.love
+	rm -rf graphing.love
+	zip -r graphing *
+	mv graphing.zip graphing.love
+	love graphing.love
