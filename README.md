@@ -8,9 +8,14 @@ It uses the super-small framework Love2d.
 2. download and install love2d to your computer
     if you are an Ubuntu user, you can install by typing the following comands:
     ```
-        sudo add-apt-repository ppa:bartbes/love-stable
-        sudo apt-get update
-        sudo apt-get install love
+    sudo add-apt-repository ppa:bartbes/love-stable
+    ```
+    ```
+    sudo apt-get update
+    ```
+    ```
+    sudo apt-get install love
+
     ```
 3. you just need the graphing.love file to run the program. Download the other files if you want to contribute :D
 
