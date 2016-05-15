@@ -68,7 +68,7 @@ function love.keypressed(key)
         if i then
             graph:remove(i)
         else
-            i = graph:find_edge_by_point(love.mouse.getX(), love.mouse.getY())
+            i = graph:find_edge_by_point(love.mouse.getX(), love.mouse.getY())  
             if i then
                 graph:remove_edge(i)
             end
