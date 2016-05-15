@@ -5,7 +5,7 @@ function love.load()
     require 'utils'
     require 'graph'
     require 'help'
-    love.window.setTitle('Graph Draw')
+    love.window.setTitle('Qx Graph Designer v0.2')
     love.window.setMode(800, 600, {resizable=true})
 
     myfont = love.graphics.newFont("LinLibertine_aDRS.ttf", Node.radius*1.2)
