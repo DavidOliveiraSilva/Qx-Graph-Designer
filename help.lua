@@ -13,13 +13,27 @@ help.txt_pages = {
     {"- d -> toggle directed graph",
     "\n- f -> toggle filled vertices ",
     "\n\n- i -> invert colors ",
-    "\n\n\n- ctrl+z -> undo action",
-    "\n\n\n\n- delete button to remove a selected vertex or selected edge."},
+    "\n\n\n- l -> print vertices labels",
+    "\n\n\n\n- ctrl+z -> undo action",
+    "\n\n\n\n\n- delete button to remove a selected vertex or selected edge."},
     {"- with the cursor over a vertex\npress a number from 1 to 9\nto change the color\npress 0 to original color.",
     "\n\n\n\n- you can also change the edge color\nby doing the same process \nbut with the cursor over the\nmiddle of an edge."
     },
     {"- press m to get the matrix form of your graph\nit will save the matrix as a list\nof lists as in python sintax.",
-     "\n\n\n- the matrix will be put in the clipboard\nso that you can just ctrl+v on your editor\nand save as a python file."}
+     "\n\n\n- the matrix will be put in the clipboard\nso that you can just ctrl+v on your editor\nand save as a python file."},
+    {"Graph creativity (?):",
+     "\n- press the key 'a' with a selected vertex\nto make this vertex point at all other vertex",
+     "\n\n\n- press shift+a with a selected vertex\nto make all other vertex point to this vertex",
+     "\n\n\n\n\n- press 'k' to make the graph complete,\npress k again to clear the graph",
+     "\n\n\n\n\n\n\n- press shift+k to create a bipartite graph!\nyou need to see the labels (by pressing l)\nbecause this function uses the labels to\nchoose the partitions",
+     "\n\n\n\n\n\n\n\n\n\n\n- if you press shift+k on a selected vertex,\nthe partitions will be choosen using this vertex"},
+    {"More graph creativity!!!",
+     "\nit is easy to create n-partite graphs:",
+     "\n\n1. make a empty graph with, say, 10 vertices",
+     "\n\n\n2. select the vertex 3 and press shift+k (don't forget to l)",
+     "\n\n\n\n3. select the vertex 6 and press shift+k",
+     "\n\n\n\n\n4. create more tree vertices",
+     "\n\n\n\n\n\n5. select the vertex 10 and press shift+k"}
 }
 
 function help:draw()

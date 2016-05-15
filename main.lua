@@ -5,12 +5,12 @@ function love.load()
     require 'utils'
     require 'graph'
     require 'help'
-    love.window.setTitle('Qx Graph Designer v0.2')
-    love.window.setMode(800, 600, {resizable=true})
+    love.window.setTitle('Qx Graph Designer v0.3')
+    love.window.setMode(800, 600, {resizable=true, vsync=false})
 
     myfont = love.graphics.newFont("LinLibertine_aDRS.ttf", Node.radius*1.2)
     
-    print_labels = true
+    print_labels = false
     inverted_colors = true
     love.graphics.setBackgroundColor(255, 255, 255)
     nodes_filled = false
@@ -95,7 +95,9 @@ function love.keypressed(key)
         end
     end
     if key == 'escape' then
-        love.event.quit()
+        if help.activated then
+            help.activated = false
+        end
     end
     if contain(key_colors, key) then
         local i = graph:find_vertice(love.mouse.getX(), love.mouse.getY())
@@ -138,6 +140,35 @@ function love.keypressed(key)
         else
             help.activated = true
             help.page = 1
+        end
+    end
+    if key == 'a' then
+        if love.keyboard.isDown('lshift') or love.keyboard.isDown('rshift') then
+            local i = graph:find_vertice()
+            if i then
+                graph:v_point_to_all(i, 'in')
+            end
+        else
+            local i = graph:find_vertice()
+            if i then
+                graph:v_point_to_all(i)
+            end
+        end
+    end
+    if key == 'k' then
+        if love.keyboard.isDown('lshift') or love.keyboard.isDown('rshift') then
+            local m = math.floor(#graph.nodes/2)
+            local i = graph:find_vertice()
+            if i then
+                m = i
+            end
+            graph:k_n_n(m)
+        else
+            if graph:is_complete() then
+                graph:clean_out()
+            else
+                graph:k_n()
+            end
         end
     end
     if help.activated then

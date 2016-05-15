@@ -1,4 +1,4 @@
-# Qx-Graph-Designer v0.2
+# Qx-Graph-Designer v0.3
 Little program to draw/design graphs. It is very useful for lectures.
 It uses the super-small framework Love2d.
 
@@ -30,4 +30,5 @@ OR
 * type ```d``` to switch directed/undirected graph
 * type ```f``` to switch filled/unfilled vertice drawing
 * type ```ctrl+z``` to undo the last thing you did
-* type ```esc``` or ```alt+F4``` to quit
+* type ```alt+F4``` to quit
+* type ```h``` to see help

@@ -98,7 +98,6 @@ function graph:draw()
         love.graphics.line(self.nodes[self.new_edge].x, self.nodes[self.new_edge].y,
             love.mouse.getX(), love.mouse.getY())
     end
-
 end
 
 function graph:update(dt)
@@ -113,17 +112,22 @@ function graph:update(dt)
 end
 
 function graph:addv(mx, my)
-    table.insert(self.nodes, Node:new({x = mx, y = my, label = string.format("%d", #self.nodes)}))
+    table.insert(self.nodes, Node:new({x = mx, y = my, label = string.format("%d", #self.nodes + 1)}))
     table.insert(self.actions, 'v')
 end
+
 function graph:adde(n1, n2)
     if n1 == n2 then
+        return
+    end
+    if self:find_edge_position(n1, n2) == 1 then
         return
     end
     table.insert(self.edges, {n1, n2})
     table.insert(self.edges_colors, {255, 255, 255})
     table.insert(self.actions, 'e')
 end
+
 function graph:start_edge(mx, my)
     local i = self:find_vertice(mx, my)
     if i then
@@ -131,8 +135,6 @@ function graph:start_edge(mx, my)
         self.new_edge = i
     end
 end
-
-
 
 function graph:end_edge(mx, my)
     if self.creating_edge then
@@ -143,6 +145,7 @@ function graph:end_edge(mx, my)
     end
     self.creating_edge = false
 end
+
 function graph:find_vertice(mx, my)
     mx = mx or love.mouse.getX()
     my = my or love.mouse.getY()
@@ -152,6 +155,41 @@ function graph:find_vertice(mx, my)
         end
     end
     return false
+end
+function graph:is_complete()
+    return #self.nodes*(#self.nodes - 1) == #self.edges
+end
+function graph:clean_out()
+    self.edges = {}
+end
+function graph:v_point_to_all(v, c)
+    if c then
+        for i = 1, #self.nodes do
+            self:adde(i, v)
+        end
+    else
+        for i = 1, #self.nodes do
+            self:adde(v, i)
+        end
+    end
+end
+function graph:k_n()
+    for i = 1, #self.nodes do
+        self:v_point_to_all(i)
+    end
+end
+
+function graph:k_n_n(m)
+    for i = 1, m do
+        for j = m+1, #self.nodes do
+            self:adde(i, j)
+        end
+    end
+    for i = m + 1, #self.nodes do
+        for j = 1, m do
+            self:adde(i, j)
+        end
+    end
 end
 
 function graph:move(i)
@@ -171,7 +209,10 @@ function graph:find_edge_position(x, y)
     for i = 1, #self.edges do
         if self.edges[i][1] == x and self.edges[i][2] == y then
             return 1
-        elseif self.edges[i][1] == y and self.edges[i][2] == x then
+        end
+    end
+    for i = 1, #self.edges do
+        if self.edges[i][1] == y and self.edges[i][2] == x then
             return 2
         end
     end
@@ -199,6 +240,12 @@ function graph:shift_id_from_edges(v, d)
     end
 end
 
+function graph:update_vertices_labels()
+    for i = 1, #self.nodes do
+        self.nodes[i].label = string.format("%d", i)
+    end
+end
+
 function graph:remove(v)
     if self.moving then
         return
@@ -216,6 +263,8 @@ function graph:remove(v)
     for j = v, #self.nodes + 1 do
         self:shift_id_from_edges(j, -1)
     end
+    self:update_vertices_labels()
+
 end
 function graph:remove_edge(e)
     table.remove(self.edges, e)
@@ -234,6 +283,8 @@ function graph:undo()
     end
 
 end
+
+
 
 function graph:convert_to_matrix()
     local matrix = {}
