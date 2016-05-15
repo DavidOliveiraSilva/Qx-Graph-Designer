@@ -1,4 +1,4 @@
-# Qx-Graph-Designer v0.1
+# Qx-Graph-Designer v0.2
 Little program to draw/design graphs. It is very useful for lectures.
 It uses the super-small framework Love2d.
 
