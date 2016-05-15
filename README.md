@@ -6,6 +6,7 @@ It uses the super-small framework Love2d.
 
 1. visit the site https://love2d.org/
 2. download and install love2d to your computer
+OR
 3. if you are an Ubuntu user, you can install by typing the following comands:
     ```
     sudo add-apt-repository ppa:bartbes/love-stable
