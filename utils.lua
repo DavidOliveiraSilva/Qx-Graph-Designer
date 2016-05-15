@@ -30,7 +30,7 @@ function correct_color(c)
     if inverted_colors then
         return {255-c[1], 255-c[2], 255-c[3]}
     else
-        return c
+        return {c[1], c[2], c[3]}
     end
 end
 
@@ -46,4 +46,22 @@ function point_in_triangle(pt, x1, y1, x2, y2, x3, y3)
     b2 = sign(pt, v2, v3) < 0.0
     b3 = sign(pt, v3, v1) < 0.0
     return ((b1 == b2) and (b2 == b3))
+end
+
+function TX()
+    local width, height, flags = love.window.getMode( )
+    return width
+end
+function TY()
+    local width, height, flags = love.window.getMode( )
+    return height
+end
+
+function senoid(func,amp, freq, offset)
+    amp = amp/2
+    if func == 'sin' then
+        return amp*math.sin(freq*relogio:getTime()) + offset + amp
+    elseif func == 'cos' then
+        return amp*math.cos(freq*relogio:getTime()) + offset + amp
+    end
 end
