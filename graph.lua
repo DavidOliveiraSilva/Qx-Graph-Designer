@@ -167,6 +167,17 @@ function graph:find_edge_by_vertice(v)
     return false
 end
 
+function graph:find_edge_position(x, y)
+    for i = 1, #self.edges do
+        if self.edges[i][1] == x and self.edges[i][2] == y then
+            return 1
+        elseif self.edges[i][1] == y and self.edges[i][2] == x then
+            return 2
+        end
+    end
+    return false
+end
+
 function graph:find_edge_by_point(x, y)
     for i = 1, #self.edges do
         local mx = (self.nodes[self.edges[i][1]].x + self.nodes[self.edges[i][2]].x)/2
@@ -222,4 +233,35 @@ function graph:undo()
         table.remove(self.actions, #self.actions)
     end
 
+end
+
+function graph:convert_to_matrix()
+    local matrix = {}
+    for i = 1, #self.nodes do
+        table.insert(matrix, {})
+        for j = 1, #self.nodes do
+            table.insert(matrix[i], 0)
+        end
+    end
+
+    for i = 1, #self.nodes do
+        for j = 1, #self.nodes do
+            if self.directed then
+                k = self:find_edge_position(i, j)
+                if k == 1 then
+                    matrix[i][j] = 1
+                else
+                    matrix[i][j] = 0
+                end
+            else
+                k = self:find_edge_position(i, j)
+                if k == 1 or k == 2 then
+                    matrix[i][j] = 1
+                else
+                    matrix[i][j] = 0
+                end
+            end
+        end
+    end
+    return matrix
 end

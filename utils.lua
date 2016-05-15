@@ -65,3 +65,19 @@ function senoid(func,amp, freq, offset)
         return amp*math.cos(freq*relogio:getTime()) + offset + amp
     end
 end
+
+function convert_matrix_to_python(matrix)
+    local p_matrix = "matrix = ["
+    for i = 1, #matrix do
+        p_matrix = p_matrix .. '['
+        for j = 1, #matrix[i] do
+            p_matrix = p_matrix .. string.format("%d", matrix[i][j])
+            if j ~= #matrix[i] then
+                p_matrix = p_matrix .. ','
+            end
+        end
+        p_matrix = p_matrix .. '],\n'
+    end
+    p_matrix = p_matrix .. ']'
+    return p_matrix
+end

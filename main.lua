@@ -10,23 +10,38 @@ function love.load()
 
     myfont = love.graphics.newFont("LinLibertine_aDRS.ttf", Node.radius*1.2)
     
-
     print_labels = true
     inverted_colors = true
     love.graphics.setBackgroundColor(255, 255, 255)
     nodes_filled = false
+
+    matrix_saved = 0
+    matrix_saved_msg = "matrix saved to clipboard"
 end
 
 function love.draw()
     graph:draw()
     help:draw()
 
+    love.graphics.setFont(help.font)
+    love.graphics.setColor(40, 255, 80, matrix_saved)
+    love.graphics.rectangle('fill', TX()/2 - help.font:getWidth(matrix_saved_msg)/2 - 10, 
+        TY()/2 - help.font:getHeight(), help.font:getWidth(matrix_saved_msg)*0.9,
+        help.font:getHeight(), 5)
+    love.graphics.setColor(255, 255, 255, matrix_saved)
+    love.graphics.print(matrix_saved_msg, TX()/2 - help.font:getWidth(matrix_saved_msg)/2,
+        TY()/2 - help.font:getHeight(), 0, 0.85, 0.85)
 end
 
 function love.update(dt)
     relogio:update(dt)
     graph:update(dt)
-
+    if matrix_saved > 0 then
+        matrix_saved = matrix_saved - dt*100
+        if matrix_saved < 0 then
+            matrix_saved = 0
+        end
+    end
 end
 
 function love.mousepressed(mx, my, key)
@@ -138,5 +153,9 @@ function love.keypressed(key)
                 help.activated = false
             end
         end
+    end
+    if key == 'm' then
+        love.system.setClipboardText( convert_matrix_to_python(graph:convert_to_matrix()))
+        matrix_saved = 200
     end
 end

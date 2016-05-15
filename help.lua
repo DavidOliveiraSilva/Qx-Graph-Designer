@@ -14,15 +14,21 @@ help.txt_pages = {
     "\n- f -> toggle filled vertices ",
     "\n\n- i -> invert colors ",
     "\n\n\n- ctrl+z -> undo action",
-    "\n\n\n\n- delete button to remove a selected vertex or selected edge"},
-    {"- with the cursor over a vertex\npress a number from 1 to 9\nto change the color\npress 0 to original color",
-    "\n\n\n\n- you can also change the edge color\nby doing the same process \nbut with the cursor over the\nmiddle of an edge"
-    }
+    "\n\n\n\n- delete button to remove a selected vertex or selected edge."},
+    {"- with the cursor over a vertex\npress a number from 1 to 9\nto change the color\npress 0 to original color.",
+    "\n\n\n\n- you can also change the edge color\nby doing the same process \nbut with the cursor over the\nmiddle of an edge."
+    },
+    {"- press m to get the matrix form of your graph\nit will save the matrix as a list\nof lists as in python sintax.",
+     "\n\n\n- the matrix will be put in the clipboard\nso that you can just ctrl+v on your editor\nand save as a python file."}
 }
 
 function help:draw()
     love.graphics.setFont(self.font)
-    love.graphics.setColor(0, 0, 0)
+    if inverted_colors then
+        love.graphics.setColor(0, 0, 0)
+    else
+        love.graphics.setColor(255, 255, 255)
+    end
     love.graphics.print("h -> toggle help", 0, 0, 0, 0.4, 0.4)
     if not self.activated then
         return
