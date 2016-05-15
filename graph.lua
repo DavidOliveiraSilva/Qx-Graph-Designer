@@ -207,7 +207,7 @@ function graph:remove(v)
     end
 end
 function graph:remove_edge(e)
-    table.remove(self.edges, i)
+    table.remove(self.edges, e)
 end
 
 function graph:undo()
