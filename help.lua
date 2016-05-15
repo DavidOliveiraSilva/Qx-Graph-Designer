@@ -1,5 +1,5 @@
 help = {}
-help.activated = true
+help.activated = false
 help.page = 1
 help.margins = 0.1
 help.font = love.graphics.newFont("Code New Roman.otf", 40)
