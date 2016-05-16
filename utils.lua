@@ -81,3 +81,24 @@ function convert_matrix_to_python(matrix)
     p_matrix = p_matrix .. ']'
     return p_matrix
 end
+
+function compare_tabs(t1, t2)
+    if #t1 ~= #t2 then return false end
+    for i = 1, #t1 do
+        if t1[i] ~= t2[i] then
+            return false
+        end
+    end
+    return true
+end
+
+function print_tab(t)
+    local s = ''
+    for i = 1, #t do
+        s = s .. t[i]
+        if i ~= #t then
+            s = s .. ', '
+        end
+    end
+    print(s)
+end

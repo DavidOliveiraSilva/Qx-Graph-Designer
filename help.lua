@@ -33,7 +33,11 @@ help.txt_pages = {
      "\n\n\n2. select the vertex 3 and press shift+k (don't forget to l)",
      "\n\n\n\n3. select the vertex 6 and press shift+k",
      "\n\n\n\n\n4. create more tree vertices",
-     "\n\n\n\n\n\n5. select the vertex 10 and press shift+k"}
+     "\n\n\n\n\n\n5. select the vertex 10 and press shift+k"},
+    {"Coloring!",
+     "\n- press 'c' to activate the coloring mode",
+     "\n\n- when coloring mode is activated you won't be\nable to color two adjacents vertices\nwith the same color",
+     "\n\n\n\n\n- also, you won't be able to color two adjacents\nedges with the same color"}
 }
 
 function help:draw()

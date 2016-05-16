@@ -102,11 +102,11 @@ function love.keypressed(key)
     if contain(key_colors, key) then
         local i = graph:find_vertice(love.mouse.getX(), love.mouse.getY())
         if i then
-            graph.nodes[i].color = colors[key]
+            graph:color_vertex(i, key)
         else
             i = graph:find_edge_by_point(love.mouse.getX(), love.mouse.getY())
             if i then
-                graph.edges_colors[i] = colors[key]
+                graph:color_edge(i, key)
             end
 
         end
@@ -185,8 +185,22 @@ function love.keypressed(key)
             end
         end
     end
+    if key == 'r' then
+        if love.keyboard.isDown('lshift') or love.keyboard.isDown('rshift') then
+            graph:random_edges()
+        else
+            graph:random_vertices()
+        end
+    end
     if key == 'm' then
         love.system.setClipboardText( convert_matrix_to_python(graph:convert_to_matrix()))
         matrix_saved = 200
+    end
+    if key == 'c' then
+        if graph.coloring then
+            graph.coloring = false
+        else
+            graph.coloring = true
+        end
     end
 end
