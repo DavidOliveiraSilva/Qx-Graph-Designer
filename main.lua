@@ -47,14 +47,21 @@ end
 function love.mousepressed(mx, my, key)
     if key == 1 then
         local i = graph:find_vertice(mx, my)
+        local j = graph:find_edge_by_point(mx, my)
         if i then
             graph:move(i)
+        elseif j then
+            graph:move_edge(j)
         else
             graph:addv(mx, my)
         end
     end
     if key == 2 then
         graph:start_edge(mx, my)
+        local j = graph:find_edge_by_point(mx, my)
+        if j then
+            graph:reset_edge(j)
+        end
     end
 end
 
@@ -62,6 +69,9 @@ function love.mousereleased(mx, my, key)
     if key == 1 then
         if graph.moving then
             graph.moving = false
+        end
+        if graph.moving_edge then
+            graph.moving_edge = false
         end
     end
     if key == 2 then
@@ -127,6 +137,13 @@ function love.keypressed(key)
             nodes_filled = true
         end
     end
+    if key == 's' then
+        if graph.selecting_edges then
+            graph.selecting_edges = false
+        else
+            graph.selecting_edges = true
+        end
+    end
     if key == 'l' then
         if print_labels then
             print_labels = false
@@ -139,7 +156,6 @@ function love.keypressed(key)
             help.activated = false
         else
             help.activated = true
-            help.page = 1
         end
     end
     if key == 'a' then

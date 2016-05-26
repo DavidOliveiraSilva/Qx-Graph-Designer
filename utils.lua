@@ -102,3 +102,20 @@ function print_tab(t)
     end
     print(s)
 end
+
+Hermite_curve = {}
+Hermite_curve.points = {}
+
+function Hermite_curve:new(pnts)
+    o = {points = {}}
+    for i = 1, #pnts do
+        table.insert(o.points, pnts[i])
+    end
+    setmetatable(o, self)
+    self.__index = self
+    return o
+end
+
+function Hermite_curve:evalueate(t)
+
+end
