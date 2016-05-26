@@ -15,7 +15,7 @@ help.txt_pages = {
     "\n- f -> toggle filled vertices ",
     "\n\n- i -> invert colors ",
     "\n\n\n- l -> print vertices labels",
-    "\n\n\n\n- ctrl+z -> undo action",
+    "\n\n\n\n- ctrl+z -> undo action (works only for add actions)",
     "\n\n\n\n\n- delete button to remove a selected vertex or selected edge."},
     {"- with the cursor over a vertex\npress a number from 1 to 9\nto change the color\npress 0 to original color.",
     "\n\n\n\n- you can also change the edge color\nby doing the same process \nbut with the cursor over the\nmiddle of an edge."
