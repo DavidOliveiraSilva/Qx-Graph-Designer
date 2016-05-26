@@ -56,6 +56,18 @@ Edge.middle_y = 0
 Edge.radius = 10
 Edge.bezier = nil
 Edge.custom = false
+Edge.label = '   '
+Edge.label_x = 0
+Edge.label_y = 0
+Edge.selecting_label = false
+function Edge:test_label(mx, my)
+    if mx < self.label_x or mx >  self.label_x + myfont:getWidth(self.label)
+        or my < self.label_y or my > self.label_y + myfont:getHeight() then
+        return false
+    end
+    return true
+end
+
 
 function Edge:angle_m()
     local rmx = (grph.nodes[self.points[1]].x + grph.nodes[self.points[2]].x)/2
@@ -79,6 +91,8 @@ graph.creating_edge = false
 graph.new_edge = 0
 
 graph.moving = false
+graph.moving_edge_label = false
+graph.moving_edge = false
 
 graph.actions = {}
 graph.coloring = false
@@ -92,9 +106,9 @@ function graph:draw()
     love.graphics.setPointSize(3)
     for i = 1, #self.edges do
         love.graphics.setColor(correct_color(self.edges[i].color))
-        
+        love.graphics.setFont(myfont)
         if self.edges[i].custom then
-            local limit = 2*math.floor(distance(self.nodes[self.edges[i].points[1]].x, self.nodes[self.edges[i].points[1]].y, 
+            local limit = math.floor(distance(self.nodes[self.edges[i].points[1]].x, self.nodes[self.edges[i].points[1]].y, 
                 self.nodes[self.edges[i].points[2]].x, self.nodes[self.edges[i].points[2]].y))
             for j = 1, limit do
                 if j < limit then
@@ -107,11 +121,28 @@ function graph:draw()
                     love.graphics.line(bx1, by1, bx2, by2)
                 end
             end
+            love.graphics.print(self.edges[i].label, self.edges[i].label_x, self.edges[i].label_y)
+            
+
         else
             love.graphics.line(self.nodes[self.edges[i].points[1]].x, self.nodes[self.edges[i].points[1]].y,
                 self.nodes[self.edges[i].points[2]].x, self.nodes[self.edges[i].points[2]].y)
+            
+            love.graphics.print(self.edges[i].label, self.edges[i].label_x, self.edges[i].label_y)
         end
-
+        if i == self:find_edge_label(love.mouse.getX(), love.mouse.getY()) then
+            local c = correct_color(self.edges[i].color)
+            love.graphics.setColor(c[1], c[2], c[3], 120)
+            if self.moving_edge_label then
+                love.graphics.setColor(correct_color(self.edges[i].color))
+                love.graphics.rectangle('line', self.edges[self.moving_edge_label].label_x, self.edges[self.moving_edge_label].label_y,
+                    myfont:getWidth(self.edges[self.moving_edge_label].label), myfont:getHeight())
+            else
+                love.graphics.rectangle('line', self.edges[i].label_x, self.edges[i].label_y,
+                    myfont:getWidth(self.edges[i].label), myfont:getHeight())
+            end
+        end
+        love.graphics.setColor(correct_color(self.edges[i].color))
         if self.directed then
             --DRAWING TRIANGLE FOR ARROW
             local ideal_t = distance(self.nodes[self.edges[i].points[1]].x, self.nodes[self.edges[i].points[1]].y,
@@ -133,7 +164,7 @@ function graph:draw()
         end
         
     end
-    if graph.selecting_edges then
+    if self.selecting_edges then
         local i = self:find_edge_by_point(love.mouse.getX(), love.mouse.getY())
         for i = 1, #self.edges do
             local mx = self.edges[i].middle_x
@@ -170,13 +201,25 @@ function graph:update(dt)
         self.nodes[self.moving].y = love.mouse.getY()
         local t = self:find_all_edge_by_vertice(self.moving)
         for i = 1, #t do
+            local t_mx = (self.nodes[self.edges[t[i]].points[1]].x + self.nodes[self.edges[t[i]].points[2]].x)/2
+            local t_my = (self.nodes[self.edges[t[i]].points[1]].y + self.nodes[self.edges[t[i]].points[2]].y)/2
+            self.edges[t[i]].label_x = t_mx
+            self.edges[t[i]].label_y = t_my
             self.edges[t[i]].custom = false
         end
     end
     if self.moving_edge then
         self.edges[self.moving_edge].middle_x = love.mouse.getX()
         self.edges[self.moving_edge].middle_y = love.mouse.getY()
+        local cx, cy = self.edges[self.moving_edge].bezier:evaluate(0.5)
+        self.edges[self.moving_edge].label_x = cx
+        self.edges[self.moving_edge].label_y = cy
         self.edges[self.moving_edge].custom = true
+        self.selecting_edges = true
+    end
+    if self.moving_edge_label then
+        self.edges[self.moving_edge_label].label_x = love.mouse.getX() - myfont:getWidth(self.edges[self.moving_edge_label].label)/2
+        self.edges[self.moving_edge_label].label_y = love.mouse.getY() - myfont:getHeight()/2
     end
     for i = 1, #self.edges do
         local t_mx = (self.nodes[self.edges[i].points[1]].x + self.nodes[self.edges[i].points[2]].x)/2
@@ -225,6 +268,8 @@ function graph:adde(n1, n2)
     local x3 = self.edges[#self.edges].middle_x
     local y3 = self.edges[#self.edges].middle_y
     self.edges[#self.edges].bezier = love.math.newBezierCurve(x1, y1, x3, y3, x2, y2)
+    self.edges[#self.edges].label_x = self.edges[#self.edges].middle_x
+    self.edges[#self.edges].label_y = self.edges[#self.edges].middle_y
     table.insert(self.nodes[n1].neighbors, n2)
     table.insert(self.nodes[n1].front, n2)
     table.insert(self.nodes[n2].neighbors, n1)
@@ -263,6 +308,19 @@ function graph:find_vertice(mx, my)
         end
     end
     return false
+end
+
+function graph:find_edge_label(mx, my)
+    for i = 1, #self.edges do
+        if self.edges[i]:test_label(mx, my) then
+            return i
+        end
+    end
+    return false
+end
+
+function graph:move_edge_label(i)
+    self.moving_edge_label = i
 end
 
 function graph:is_complete()
