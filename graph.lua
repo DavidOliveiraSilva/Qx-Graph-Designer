@@ -96,8 +96,9 @@ graph.moving_edge = false
 
 graph.actions = {}
 graph.coloring = false
-
 graph.selecting_edges = false
+graph.print_it = false
+
 
 function graph:draw()
     
@@ -237,6 +238,15 @@ function graph:update(dt)
             self.nodes[self.edges[i].points[2]].x, self.nodes[self.edges[i].points[2]].y)
         
     end
+
+    if self.print_it then
+        print('\n\n\n\n\n')
+        for i = 1, #self.nodes do
+            print('\n')
+            self:print_neighbors(i)
+        end
+        self.print_it = false
+    end
 end
 
 function graph:reset_edge(i)
@@ -248,7 +258,8 @@ function graph:reset_edge(i)
 end
 
 function graph:addv(mx, my)
-    table.insert(self.nodes, Node:new({x = mx, y = my, label = string.format("%d", #self.nodes + 1), neighbors = {}}))
+    table.insert(self.nodes, Node:new({x = mx, y = my, label = string.format("%d", #self.nodes + 1),
+        neighbors = {}, front = {}, back = {}}))
     table.insert(self.actions, 'v')
 end
 
@@ -270,11 +281,49 @@ function graph:adde(n1, n2)
     self.edges[#self.edges].bezier = love.math.newBezierCurve(x1, y1, x3, y3, x2, y2)
     self.edges[#self.edges].label_x = self.edges[#self.edges].middle_x
     self.edges[#self.edges].label_y = self.edges[#self.edges].middle_y
-    table.insert(self.nodes[n1].neighbors, n2)
+    if not contain(self.nodes[n1].neighbors, n2) then
+        table.insert(self.nodes[n1].neighbors, n2)
+    end
     table.insert(self.nodes[n1].front, n2)
-    table.insert(self.nodes[n2].neighbors, n1)
+
+    if not contain(self.nodes[n2].neighbors, n1) then
+        table.insert(self.nodes[n2].neighbors, n1)
+    end
     table.insert(self.nodes[n2].back, n1)
-    table.insert(self.actions, 'e')    
+
+
+    table.insert(self.actions, 'e')
+end
+
+function graph:print_neighbors(i)
+    s = ''
+    for j = 1, #self.nodes[i].neighbors do
+        s = s .. string.format(self.nodes[i].neighbors[j])
+        if j ~= #self.nodes[i].neighbors then
+            s = s .. ', '
+        end
+    end
+    print(string.format("%d neig: " .. s, i))
+
+    s = ''
+    for j = 1, #self.nodes[i].front do
+        s = s .. string.format(self.nodes[i].front[j])
+        if j ~= #self.nodes[i].front then
+            s = s .. ', '
+        end
+    end
+    print(string.format("%d front: " .. s, i))
+
+    s = ''
+    for j = 1, #self.nodes[i].back do
+
+        s = s .. string.format(self.nodes[i].back[j])
+        if j ~= #self.nodes[i].back then
+            s = s .. ', '
+        end
+    end
+    print(string.format("%d back: " .. s, i))
+
 end
 
 function graph:start_edge(mx, my)
@@ -328,7 +377,10 @@ function graph:is_complete()
 end
 
 function graph:clean_out()
-    self.edges = {}
+    print("aaaaaa")
+    for i = #self.edges, 1, -1 do
+        self:remove_edge(i)
+    end
 end
 
 function graph:v_point_to_all(v, c)
@@ -512,15 +564,26 @@ function graph:remove(v)
 
 end
 function graph:remove_edge(e)
-    local i = contain(self.nodes[self.edges[e].points[1]].neighbors, self.edges[e].points[2])
-    table.remove(self.nodes[self.edges[e].points[1]].neighbors, i)
-    i = contain(self.nodes[self.edges[e].points[1]].front, self.edges[e].points[2])
-    table.remove(self.nodes[self.edges[e].points[1]], i)
-
-    i = contain(self.nodes[self.edges[e].points[2]].neighbors, self.edges[e].points[1])
-    table.remove(self.nodes[self.edges[e].points[2]].neighbors, i)
-    i = contain(self.nodes[self.edges[e].points[2]].back, self.edges[e].points[1])
-    table.remove(self.nodes[self.edges[e].points[2]], i)
+    local n1 = self.edges[e].points[1]
+    local n2 = self.edges[e].points[2]
+    local i = contain(self.nodes[n1].neighbors, n2)
+    if i then
+        table.remove(self.nodes[n1].neighbors, i)
+    end
+    
+    i = contain(self.nodes[n1].front, n2)
+    
+    if i then
+    table.remove(self.nodes[n1].front, i)
+    end
+    i = contain(self.nodes[n2].neighbors, n1)
+    if i then
+        table.remove(self.nodes[n2].neighbors, i)
+    end
+    i = contain(self.nodes[n2].back, n1)
+    if i then
+        table.remove(self.nodes[n2].back, i)
+    end
 
     table.remove(self.edges, e)
 end

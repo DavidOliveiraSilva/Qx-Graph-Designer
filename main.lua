@@ -92,10 +92,17 @@ end
 function love.keypressed(key)
     if text_input.is_open then
         if key == 'return' then
-            local txt, j = text_input:close()
-            graph.edges[j].label = txt
+            local txt, buf = text_input:close()
+            if buf[2] == 'edge' then
+                graph.edges[buf[1]].label = txt
+            elseif buf[2] == 'node' then
+                graph.nodes[buf[1]].label = txt
+            end
         end
     else
+        if key == 'p' then
+            graph.print_it = true
+        end
         if key == 'd' then
             if graph.directed then
                 graph.directed = false
@@ -237,8 +244,11 @@ function love.keypressed(key)
         if key == 'return' then
             
             local j = graph:find_edge_by_point(love.mouse.getX(), love.mouse.getY()) or graph:find_edge_label(love.mouse.getX(), love.mouse.getY())
+            local k = graph:find_vertice(love.mouse.getX(), love.mouse.getY())
             if j then
-                text_input:open(j)
+                text_input:open({j, 'edge'})
+            elseif k then
+                text_input:open({k, 'node'})
             end
         end
     end
