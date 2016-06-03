@@ -53,12 +53,16 @@ Edge.color = {255, 255, 255}
 Edge.points = {}
 Edge.middle_x = 0
 Edge.middle_y = 0
+Edge.delta_angle = 0
+Edge.delta_radius = 0 
 Edge.radius = 10
 Edge.bezier = nil
 Edge.custom = false
 Edge.label = '   '
 Edge.label_x = 0
 Edge.label_y = 0
+Edge.l_delta_angle = 0
+Edge.l_delta_radius = 0 
 Edge.selecting_label = false
 function Edge:test_label(mx, my)
     if mx < self.label_x or mx >  self.label_x + myfont:getWidth(self.label)
@@ -99,10 +103,15 @@ graph.coloring = false
 graph.selecting_edges = false
 graph.print_it = false
 
+graph.msgs = {'directed'}
+
 
 function graph:draw()
     
     love.graphics.setColor(correct_color({255, 255, 255}))
+    for i = 1, #self.msgs do
+        love.graphics.print(self.msgs[i], 0, help.font:getHeight()*i*0.4, 0, 0.4, 0.4)
+    end
     love.graphics.setLineWidth(2)
     love.graphics.setPointSize(3)
     for i = 1, #self.edges do
@@ -185,11 +194,7 @@ function graph:draw()
         love.graphics.line(self.nodes[self.new_edge].x, self.nodes[self.new_edge].y,
             love.mouse.getX(), love.mouse.getY())
     end
-    if self.coloring then
-        love.graphics.setColor(correct_color(colors['8']))
-        love.graphics.setFont(help.font)
-        love.graphics.print("\ncoloring...", 0, 0, 0, 0.4, 0.4)
-    end
+    
 end
 
 function graph:update(dt)
@@ -198,38 +203,85 @@ function graph:update(dt)
     end
     
     if self.moving then
+        local oldx = self.nodes[self.moving].x
+        local oldy = self.nodes[self.moving].y
         self.nodes[self.moving].x = love.mouse.getX()
         self.nodes[self.moving].y = love.mouse.getY()
         local t = self:find_all_edge_by_vertice(self.moving)
+
         for i = 1, #t do
-            local t_mx = (self.nodes[self.edges[t[i]].points[1]].x + self.nodes[self.edges[t[i]].points[2]].x)/2
-            local t_my = (self.nodes[self.edges[t[i]].points[1]].y + self.nodes[self.edges[t[i]].points[2]].y)/2
-            self.edges[t[i]].label_x = t_mx
-            self.edges[t[i]].label_y = t_my
-            self.edges[t[i]].custom = false
+            if self.edges[t[i]].points[1] == self.moving then
+                local t_mx = (self.nodes[self.edges[t[i]].points[1]].x + self.nodes[self.edges[t[i]].points[2]].x)/2
+                local t_my = (self.nodes[self.edges[t[i]].points[1]].y + self.nodes[self.edges[t[i]].points[2]].y)/2
+
+
+                local d_angle = math.atan2(self.nodes[self.moving].y - self.nodes[self.edges[t[i]].points[2]].y,
+                    self.nodes[self.moving].x - self.nodes[self.edges[t[i]].points[2]].x)
+                d_angle = d_angle - math.atan2(oldy- self.nodes[self.edges[t[i]].points[2]].y,
+                    oldx - self.nodes[self.edges[t[i]].points[2]].x)
+                self.edges[t[i]].delta_angle = self.edges[t[i]].delta_angle + d_angle
+
+                self.edges[t[i]].l_delta_angle = self.edges[t[i]].l_delta_radius + d_angle
+
+                local cx, cy = self.edges[t[i]].bezier:evaluate(0.5)
+                self.edges[t[i]].label_x = cx + self.edges[t[i]].l_delta_radius*math.cos(self.edges[t[i]].l_delta_angle)
+                self.edges[t[i]].label_y = cy + self.edges[t[i]].l_delta_radius*math.sin(self.edges[t[i]].l_delta_angle)
+
+            else
+                local t_mx = (self.nodes[self.edges[t[i]].points[1]].x + self.nodes[self.edges[t[i]].points[2]].x)/2
+                local t_my = (self.nodes[self.edges[t[i]].points[1]].y + self.nodes[self.edges[t[i]].points[2]].y)/2
+
+
+                local d_angle = math.atan2(self.nodes[self.moving].y - self.nodes[self.edges[t[i]].points[1]].y,
+                    self.nodes[self.moving].x - self.nodes[self.edges[t[i]].points[1]].x)
+                d_angle = d_angle - math.atan2(oldy- self.nodes[self.edges[t[i]].points[1]].y,
+                    oldx - self.nodes[self.edges[t[i]].points[1]].x)
+                self.edges[t[i]].delta_angle = self.edges[t[i]].delta_angle + d_angle
+
+                self.edges[t[i]].l_delta_angle = self.edges[t[i]].l_delta_radius + d_angle
+
+               
+            end
         end
     end
     if self.moving_edge then
         self.edges[self.moving_edge].middle_x = love.mouse.getX()
         self.edges[self.moving_edge].middle_y = love.mouse.getY()
         local cx, cy = self.edges[self.moving_edge].bezier:evaluate(0.5)
-        self.edges[self.moving_edge].label_x = cx
-        self.edges[self.moving_edge].label_y = cy
+        self.edges[self.moving_edge].label_x = cx + self.edges[self.moving_edge].l_delta_radius*math.cos(self.edges[self.moving_edge].l_delta_angle)
+        self.edges[self.moving_edge].label_y = cy + self.edges[self.moving_edge].l_delta_radius*math.sin(self.edges[self.moving_edge].l_delta_angle)
         self.edges[self.moving_edge].custom = true
         self.selecting_edges = true
+
+        local t_mx = (self.nodes[self.edges[self.moving_edge].points[1]].x + self.nodes[self.edges[self.moving_edge].points[2]].x)/2
+        local t_my = (self.nodes[self.edges[self.moving_edge].points[1]].y + self.nodes[self.edges[self.moving_edge].points[2]].y)/2
+
+        self.edges[self.moving_edge].delta_angle = math.atan2(love.mouse.getY() - t_my,
+                                                            love.mouse.getX() - t_mx)
+        self.edges[self.moving_edge].delta_radius = distance(love.mouse.getX(), love.mouse.getY(), t_mx, t_my)
+        
     end
     if self.moving_edge_label then
         self.edges[self.moving_edge_label].label_x = love.mouse.getX() - myfont:getWidth(self.edges[self.moving_edge_label].label)/2
         self.edges[self.moving_edge_label].label_y = love.mouse.getY() - myfont:getHeight()/2
+        local cx, cy = self.edges[self.moving_edge_label].bezier:evaluate(0.5)
+       
+        self.edges[self.moving_edge_label].l_delta_angle = math.atan2(love.mouse.getY() - cy,
+                                                            love.mouse.getX() - cx)
+        self.edges[self.moving_edge_label].l_delta_radius = distance(love.mouse.getX(), love.mouse.getY(), cx, cy)
     end
     for i = 1, #self.edges do
         local t_mx = (self.nodes[self.edges[i].points[1]].x + self.nodes[self.edges[i].points[2]].x)/2
         local t_my = (self.nodes[self.edges[i].points[1]].y + self.nodes[self.edges[i].points[2]].y)/2
         
-        if not self.edges[i].custom then
-            self.edges[i].middle_x = t_mx
-            self.edges[i].middle_y = t_my
-        end
+        self.edges[i].middle_x = t_mx + self.edges[i].delta_radius*math.cos(self.edges[i].delta_angle)
+        self.edges[i].middle_y = t_my + self.edges[i].delta_radius*math.sin(self.edges[i].delta_angle)
+
+        local cx, cy = self.edges[i].bezier:evaluate(0.5)
+        self.edges[i].label_x = cx + self.edges[i].l_delta_radius*math.cos(self.edges[i].l_delta_angle)
+        self.edges[i].label_y = cy + self.edges[i].l_delta_radius*math.sin(self.edges[i].l_delta_angle)
+
+
         self.edges[i].bezier:setControlPoint(1, 
             self.nodes[self.edges[i].points[1]].x, self.nodes[self.edges[i].points[1]].y)
         self.edges[i].bezier:setControlPoint(2, 
@@ -303,7 +355,7 @@ function graph:print_neighbors(i)
             s = s .. ', '
         end
     end
-    print(string.format("%d neig: " .. s, i))
+    print(string.format("%d neighbors: " .. s, i))
 
     s = ''
     for j = 1, #self.nodes[i].front do

@@ -91,7 +91,15 @@ end
 
 function love.keypressed(key)
     if text_input.is_open then
-        if key == 'return' then
+        if key == 'backspace' then
+            text_input:backspace()
+        elseif key == 'delete' then
+            text_input:delete()
+        elseif key == 'left' then
+            text_input:left()
+        elseif key == 'right' then
+            text_input:right()
+        elseif key == 'return' then
             local txt, buf = text_input:close()
             if buf[2] == 'edge' then
                 graph.edges[buf[1]].label = txt
@@ -106,8 +114,16 @@ function love.keypressed(key)
         if key == 'd' then
             if graph.directed then
                 graph.directed = false
+                local i = contain(graph.msgs, 'directed')
+                if i then
+                    graph.msgs[i] = 'undirected'
+                end
             else
                 graph.directed = true
+                local i = contain(graph.msgs, 'undirected')
+                if i then
+                    graph.msgs[i] = 'directed'
+                end
             end
         end
         if key == 'delete' then
@@ -237,8 +253,13 @@ function love.keypressed(key)
         if key == 'c' then
             if graph.coloring then
                 graph.coloring = false
+                local i = contain(graph.msgs, 'coloring')
+                if i then
+                    table.remove(graph.msgs, i)
+                end
             else
                 graph.coloring = true
+                table.insert(graph.msgs, 'coloring')
             end
         end
         if key == 'return' then
@@ -258,15 +279,7 @@ function love.textinput(text)
     if not text_input.is_open then
         return
     end
-    if text == 'backspace' then
-        text_input:backspace()
-    elseif text == 'delete' then
-        text_input:delete()
-    elseif text == 'left' then
-        text_input:left()
-    elseif text == 'right' then
-        text_input:right()
-    elseif text then
+    if text then
         text_input:insert(text)
     end
 end
