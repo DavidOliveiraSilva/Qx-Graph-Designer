@@ -78,3 +78,4 @@ function text_input:right()
         self.cursor = self.cursor + 1
     end
 end
+

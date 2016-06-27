@@ -103,6 +103,10 @@ graph.coloring = false
 graph.selecting_edges = false
 graph.print_it = false
 
+graph.max_radius = 50
+graph.min_radius = 5
+graph.default_radius = 15
+
 graph.msgs = {'directed'}
 
 
@@ -132,7 +136,6 @@ function graph:draw()
                 end
             end
             love.graphics.print(self.edges[i].label, self.edges[i].label_x, self.edges[i].label_y)
-            
 
         else
             love.graphics.line(self.nodes[self.edges[i].points[1]].x, self.nodes[self.edges[i].points[1]].y,
@@ -170,7 +173,7 @@ function graph:draw()
             local y2 = y1 + self.arrow_length*math.sin(angle + math.pi/6)
             local x3 = x1 + self.arrow_length*math.cos(angle - math.pi/6)
             local y3 = y1 + self.arrow_length*math.sin(angle - math.pi/6)
-            love.graphics.polygon('fill', x1, y1, x2, y2, x3, y3)
+            love.graphics.polygon('fill', x1, y1, x2,y2, x3, y3)
         end
         
     end
@@ -194,6 +197,12 @@ function graph:draw()
         love.graphics.line(self.nodes[self.new_edge].x, self.nodes[self.new_edge].y,
             love.mouse.getX(), love.mouse.getY())
     end
+    love.graphics.setFont(help.font)
+    love.graphics.setColor(correct_color({255, 255, 255}))
+    love.graphics.rectangle("line", TX() - help.font:getWidth(string.format("%d", self.default_radius))*0.5,
+        0, help.font:getWidth(string.format("%d", self.default_radius))*0.5, help.font:getHeight()*0.5)
+    love.graphics.print(self.default_radius, TX() - 0.5*help.font:getWidth(string.format("%d", self.default_radius)),
+        0, 0, 0.5, 0.5)
     
 end
 
@@ -310,7 +319,7 @@ function graph:reset_edge(i)
 end
 
 function graph:addv(mx, my)
-    table.insert(self.nodes, Node:new({x = mx, y = my, label = string.format("%d", #self.nodes + 1),
+    table.insert(self.nodes, Node:new({radius = self.default_radius, x = mx, y = my, label = string.format("%d", #self.nodes + 1),
         neighbors = {}, front = {}, back = {}}))
     table.insert(self.actions, 'v')
 end
@@ -319,7 +328,7 @@ function graph:adde(n1, n2)
     if n1 == n2 then
         return
     end
-    if self:find_edge_position(n1, n2) == 1 then
+    if self:find_edge_position(n1, n2) == 1 or (not self.directed and self:find_edge_position(n1, n2)) then
         return
     end
     table.insert(self.edges, Edge:new({points={n1, n2}, color={255, 255, 255}, 
@@ -434,6 +443,27 @@ function graph:clean_out()
         self:remove_edge(i)
     end
 end
+
+function graph:inc_radius(i)
+    if not i then
+        if self.default_radius < self.max_radius then
+            self.default_radius = self.default_radius + 1
+        end
+    elseif self.nodes[i].radius < self.max_radius then
+        self.nodes[i].radius = self.nodes[i].radius + 1
+    end
+end
+
+function graph:dec_radius(i)
+    if not i then
+        if self.default_radius > self.min_radius then
+            self.default_radius = self.default_radius - 1
+        end
+    elseif self.nodes[i].radius > self.min_radius then
+        self.nodes[i].radius = self.nodes[i].radius - 1
+    end
+end
+
 
 function graph:v_point_to_all(v, c)
     if c then

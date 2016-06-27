@@ -86,7 +86,23 @@ function love.mousereleased(mx, my, key)
     if key == 2 then
         graph:end_edge(mx, my)
     end
-
+end
+function love.wheelmoved(h, v)
+    if h < 0 then
+        local i = graph:find_vertice(love.mouse.getX(), love.mouse.getY())
+        if i then
+            graph:inc_radius(i)
+        else
+            graph:inc_radius()
+        end
+    elseif h > 0 then
+        local i = graph:find_vertice(love.mouse.getX(), love.mouse.getY())
+        if i then
+            graph:dec_radius(i)
+        else
+            graph:dec_radius()
+        end
+    end
 end
 
 function love.keypressed(key)
@@ -113,12 +129,14 @@ function love.keypressed(key)
         end
         if key == 'd' then
             if graph.directed then
+                graph:clean_out()
                 graph.directed = false
                 local i = contain(graph.msgs, 'directed')
                 if i then
                     graph.msgs[i] = 'undirected'
                 end
             else
+                graph:clean_out()
                 graph.directed = true
                 local i = contain(graph.msgs, 'undirected')
                 if i then
@@ -127,6 +145,7 @@ function love.keypressed(key)
             end
         end
         if key == 'delete' then
+
             local i = graph:find_vertice(love.mouse.getX(), love.mouse.getY())
             if i then
                 graph:remove(i)
