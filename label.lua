@@ -81,3 +81,12 @@ function labels_contr:find(mx, my)
     end
     return false
 end
+
+function labels_contr:delete(mx, my)
+    for i = 1, #self.list do
+        if self.list[i]:test_point(mx, my) then
+            table.remove(self.list, i)
+            break
+        end
+    end
+end

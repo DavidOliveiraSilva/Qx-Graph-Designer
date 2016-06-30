@@ -161,6 +161,7 @@ function love.keypressed(key)
         if key == 'delete' then
 
             local i = graph:find_vertice(love.mouse.getX(), love.mouse.getY())
+            labels_contr:delete(love.mouse.getX(), love.mouse.getY())
             if i then
                 graph:remove(i)
             else
