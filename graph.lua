@@ -113,6 +113,7 @@ graph.msgs = {'directed'}
 function graph:draw()
     
     love.graphics.setColor(correct_color({255, 255, 255}))
+    love.graphics.setFont(help.font)
     for i = 1, #self.msgs do
         love.graphics.print(self.msgs[i], 0, help.font:getHeight()*i*0.4, 0, 0.4, 0.4)
     end

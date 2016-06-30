@@ -3,6 +3,7 @@ text_input.is_open = false
 text_input.text = ''
 text_input.cursor = 0
 text_input.buffer = 0
+text_input.count = 0
 
 function text_input:draw()
     if self.is_open then
@@ -44,10 +45,14 @@ function text_input:open(anything)
 end
 function text_input:close()
     self.is_open = false
+    self.count = 0
     return self.text, self.buffer
 end
 
 function text_input:insert(c)
+    if self.count < 1 then
+        return
+    end
     local f = self.text:sub(1,self.cursor)
     local g = self.text:sub(self.cursor+1, #self.text)
     self.text = f .. c .. g

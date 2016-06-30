@@ -3,9 +3,11 @@ function love.load()
     relogio:start()
     require 'class'
     require 'utils'
+    require 'label'
     require 'graph'
     require 'help'
     require 'text_input'
+
     love.window.setTitle('Qx Graph Designer v0.3')
     love.window.setMode(800, 600, {resizable=true, vsync=false})
 
@@ -33,6 +35,7 @@ function love.draw()
     love.graphics.print(matrix_saved_msg, TX()/2 - help.font:getWidth(matrix_saved_msg)/2,
         TY()/2 - help.font:getHeight(), 0, 0.85, 0.85)
     text_input:draw()
+    labels_contr:draw()
 end
 
 function love.update(dt)
@@ -44,6 +47,7 @@ function love.update(dt)
             matrix_saved = 0
         end
     end
+    labels_contr:update(dt)
 end
 
 function love.mousepressed(mx, my, key)
@@ -51,13 +55,15 @@ function love.mousepressed(mx, my, key)
         local i = graph:find_vertice(mx, my)
         local j = graph:find_edge_by_point(mx, my)
         local k = graph:find_edge_label(mx, my)
-
+        local l = labels_contr:find(mx, my)
         if i then
             graph:move(i)
         elseif j then
             graph:move_edge(j)
         elseif k then
             graph:move_edge_label(k)
+        elseif l then
+            labels_contr:move(l, mx, my)
         else
             graph:addv(mx, my)
         end
@@ -81,6 +87,9 @@ function love.mousereleased(mx, my, key)
         end
         if graph.moving_edge_label then
             graph.moving_edge_label = false
+        end
+        if labels_contr.moving_label then
+            labels_contr.moving_label = false
         end
     end
     if key == 2 then
@@ -121,9 +130,14 @@ function love.keypressed(key)
                 graph.edges[buf[1]].label = txt
             elseif buf[2] == 'node' then
                 graph.nodes[buf[1]].label = txt
+            elseif buf == 'new label' then
+                labels_contr:add(txt)
             end
         end
     else
+        if key == 'e' then
+            labels_contr:add_1(love.mouse.getX(), love.mouse.getY())
+        end
         if key == 'p' then
             graph.print_it = true
         end
@@ -282,7 +296,7 @@ function love.keypressed(key)
             end
         end
         if key == 'return' then
-            
+            --[[
             local j = graph:find_edge_by_point(love.mouse.getX(), love.mouse.getY()) or graph:find_edge_label(love.mouse.getX(), love.mouse.getY())
             local k = graph:find_vertice(love.mouse.getX(), love.mouse.getY())
             if j then
@@ -290,6 +304,7 @@ function love.keypressed(key)
             elseif k then
                 text_input:open({k, 'node'})
             end
+            ]]--
         end
     end
 end
@@ -300,5 +315,6 @@ function love.textinput(text)
     end
     if text then
         text_input:insert(text)
+        text_input.count = text_input.count + 1
     end
 end
