@@ -296,6 +296,12 @@ function love.keypressed(key)
                 table.insert(graph.msgs, 'coloring')
             end
         end
+        if key == 'up' then
+            graph:inc_radius()
+        end
+        if key == 'down' then
+            graph:dec_radius()
+        end
         if key == 'return' then
             --[[
             local j = graph:find_edge_by_point(love.mouse.getX(), love.mouse.getY()) or graph:find_edge_label(love.mouse.getX(), love.mouse.getY())
